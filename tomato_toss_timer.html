@@ -181,129 +181,146 @@ color: orangered;
 <div id="errorMessage" style="color: red;"></div>
 
 <script>
-    const timerDisplay = document.getElementById('timer');
-    const statusIndicator = document.getElementById('statusIndicator');
-    const minTimeDropdown = document.getElementById('minTimeDropdown');
-    const maxTimeDropdown = document.getElementById('maxTimeDropdown');
-    const urlInput = document.getElementById('urlInput');
-    const clearURLButton = document.getElementById('clearURLButton');
-    const startButton = document.getElementById('startButton');
-    const pauseButton = document.getElementById('pauseButton');
-    const resetButton = document.getElementById('resetButton');
-    const toggleDisplayButton = document.getElementById('toggleDisplayButton');
-    const errorMessage = document.getElementById('errorMessage');
+   const timerDisplay = document.getElementById('timer');
+const statusIndicator = document.getElementById('statusIndicator');
+const minTimeDropdown = document.getElementById('minTimeDropdown');
+const maxTimeDropdown = document.getElementById('maxTimeDropdown');
+const urlInput = document.getElementById('urlInput');
+const clearURLButton = document.getElementById('clearURLButton');
+const startButton = document.getElementById('startButton');
+const pauseButton = document.getElementById('pauseButton');
+const resetButton = document.getElementById('resetButton');
+const toggleDisplayButton = document.getElementById('toggleDisplayButton');
+const errorMessage = document.getElementById('errorMessage');
 
-    let countdown;
-    let isPaused = false;
-    let isHidden = false;
+let countdown;
+let isPaused = false;
+let isHidden = false;
+let remainingSeconds;  // Declare this variable to keep track of the remaining time
 
-    function isValidURL(string) {
-        const res = string.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?$/);
-        return (res !== null);
-    };
+function isValidURL(string) {
+    const res = string.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)?$/);
+    return (res !== null);
+};
 
-    function updateStatusIndicator() {
-        if (countdown && !isPaused) {
-            statusIndicator.textContent = 'TIMER RUNNING';
-            statusIndicator.style.color = 'red';
-        } else {
-            statusIndicator.textContent = 'TIMER STOPPED';
-            statusIndicator.style.color = 'black';
+function updateStatusIndicator() {
+    if (countdown && !isPaused) {
+        statusIndicator.textContent = 'TIMER RUNNING';
+        statusIndicator.style.color = 'red';
+    } else {
+        statusIndicator.textContent = 'TIMER STOPPED';
+        statusIndicator.style.color = 'black';
+    }
+}
+
+// Initial state
+updateStatusIndicator();
+
+clearURLButton.addEventListener('click', function() {
+    urlInput.value = '';
+});
+
+toggleDisplayButton.addEventListener('click', function() {
+    if (isHidden) {
+        timerDisplay.style.display = "block";
+        toggleDisplayButton.textContent = "Hide Countdown";
+        isHidden = false;
+        if (!countdown && !isPaused) {
+            timerDisplay.textContent = 'PICK A TIME';
         }
+    } else {
+        toggleDisplayButton.textContent = "Show Countdown";
+        timerDisplay.textContent = 'COUNTDOWN HIDDEN';
+        isHidden = true;
+    }
+});
+
+startButton.addEventListener('click', function() {
+    errorMessage.textContent = '';
+
+    if (!isValidURL(urlInput.value)) {
+        errorMessage.textContent = 'Please enter a valid URL.';
+        return;
     }
 
-    // Initial state
-    updateStatusIndicator();
+    if (countdown) {
+        clearInterval(countdown);
+    }
 
-    // Clear the URL input field
-    clearURLButton.addEventListener('click', function() {
-        urlInput.value = '';
-    });
+    const minTime = parseInt(minTimeDropdown.value, 10);
+    const maxTime = parseInt(maxTimeDropdown.value, 10);
+    if (minTime >= maxTime) {
+        errorMessage.textContent = 'Minimum time should be less than maximum time.';
+        return;
+    }
+    remainingSeconds = Math.floor(Math.random() * (maxTime - minTime + 1) + minTime);
+    isPaused = false;
 
-    // Toggle the visibility of the countdown display
-    toggleDisplayButton.addEventListener('click', function() {
-        if (isHidden) {
-            timerDisplay.style.display = "block";
-            toggleDisplayButton.textContent = "Hide Countdown";
-            isHidden = false;
-        if (!countdown && !isPaused) { // If timer is not running and not paused
-                timerDisplay.textContent = 'PICK A TIME';
-            }
-        } else {
-            toggleDisplayButton.textContent = "Show Countdown";
-            timerDisplay.textContent = 'COUNTDOWN HIDDEN';
-            isHidden = true;
-        }
-    });
-
-    startButton.addEventListener('click', function() {
-        errorMessage.textContent = ''; // Clear previous error messages
-
-        if (!isValidURL(urlInput.value)) {
-            errorMessage.textContent = 'Please enter a valid URL.';
-            return;
-        }
-
-        if (countdown) {
+    countdown = setInterval(() => {
+        if (remainingSeconds <= 0) {
             clearInterval(countdown);
-        }
+            timerDisplay.textContent = '0';
+            timerDisplay.style.animation = 'blink 1s infinite';
+            statusIndicator.textContent = 'TIME UP';
+            statusIndicator.style.color = 'red';
 
-        const minTime = parseInt(minTimeDropdown.value, 10);
-        const maxTime = parseInt(maxTimeDropdown.value, 10);
-        if (minTime >= maxTime) {
-            errorMessage.textContent = 'Minimum time should be less than maximum time.';
-            return;
+            const urlToOpen = urlInput.value || 'https://www.example.com';
+            window.open(urlToOpen, '_blank');
+        } else {
+            timerDisplay.style.animation = '';
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            timerDisplay.textContent = `${minutes} minutes ${seconds} seconds left`;
+            remainingSeconds--;
         }
-        const randomTime = Math.floor(Math.random() * (maxTime - minTime + 1) + minTime);
-        let totalSeconds = randomTime;
+    }, 1000);
+    updateStatusIndicator();
+});
+
+pauseButton.addEventListener('click', function() {
+    if (!isPaused) {
+        clearInterval(countdown);
+        pauseButton.textContent = "Resume";
+        isPaused = true;
+        updateStatusIndicator();
+    } else {
         isPaused = false;
+        pauseButton.textContent = "Pause";
 
-        // Start the timer
         countdown = setInterval(() => {
-            if (totalSeconds <= 0) {
+            if (remainingSeconds <= 0) {
                 clearInterval(countdown);
                 timerDisplay.textContent = '0';
                 timerDisplay.style.animation = 'blink 1s infinite';
                 statusIndicator.textContent = 'TIME UP';
                 statusIndicator.style.color = 'red';
-                
+
                 const urlToOpen = urlInput.value || 'https://www.example.com';
                 window.open(urlToOpen, '_blank');
             } else {
-                timerDisplay.style.animation = ''; // Reset the blink animation
-                const minutes = Math.floor(totalSeconds / 60);
-                const seconds = totalSeconds % 60;
+                timerDisplay.style.animation = '';
+                const minutes = Math.floor(remainingSeconds / 60);
+                const seconds = remainingSeconds % 60;
                 timerDisplay.textContent = `${minutes} minutes ${seconds} seconds left`;
-                totalSeconds--;
+                remainingSeconds--;
             }
         }, 1000);
         updateStatusIndicator();
-    });
-
-    pauseButton.addEventListener('click', function() {
-        if (!isPaused) {
-            clearInterval(countdown);
-            countdown = null; // Ensure the timer is considered as stopped
-            pauseButton.textContent = "Resume";
-            isPaused = true;
-            updateStatusIndicator();
-        } else {
-            isPaused = false;
-            startButton.click(); // Reuse the start function to continue from the current time
-        }
-    });
+    }
+});
 
 resetButton.addEventListener('click', function() {
     clearInterval(countdown);
-    countdown = null; // Ensure the timer is considered as stopped
-    timerDisplay.textContent = 'PICK A TIME'; // Set default display text on reset
-    timerDisplay.style.animation = ''; // Reset the blink animation
+    countdown = null;
+    timerDisplay.textContent = 'PICK A TIME';
+    timerDisplay.style.animation = '';
     minTimeDropdown.value = "300";
     maxTimeDropdown.value = "1800";
     pauseButton.textContent = "Pause";
     isPaused = false;
     updateStatusIndicator();
 });
+
 </script>
 
 </body>
