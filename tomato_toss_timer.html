@@ -1,171 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer with Updated Reset Functionality</title>
-    <style>
-        /* Container styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
+<label for="minTimeDropdown">Select minimum time:</label>
+<select id="minTimeDropdown">
+    <option value="5">5 seconds</option>
+    <option value="10">10 seconds</option>
+    <option value="30">30 seconds</option>
+    <option value="60">1 minute</option>
+    <option value="300" selected>5 minutes</option>
+    <option value="600">10 minutes</option>
+    <option value="1800">30 minutes</option>
+    <option value="3600">1 hour</option>
+</select>
 
-        /* Timer container styles */
-        #timer {
-            font-size: 24px;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-        }
+<label for="maxTimeDropdown">Select maximum time:</label>
+<select id="maxTimeDropdown">
+    <option value="10">10 seconds</option>
+    <option value="30">30 seconds</option>
+    <option value="60">1 minute</option>
+    <option value="300">5 minutes</option>
+    <option value="600">10 minutes</option>
+    <option value="1800" selected>30 minutes</option>
+    <option value="3600">1 hour</option>
+</select>
 
-        /* Button styles */
-        button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            margin: 5px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
-        }
+<br>
 
-        button:hover {
-            background-color: #0056b3;
-        }
+<label for="urlInput">Enter custom URL:</label>
+<input type="text" id="urlInput" value="https://www.youtube.com/watch?v=v7IIi-ETL7U">
+<button id="clearURLButton">Clear URL</button>
 
-        /* Dropdown styles */
-        select {
-            padding: 5px;
-            font-size: 16px;
-            border-radius: 5px;
-        }
+<br>
 
-        /* Input and clear button styles */
-        #urlInput {
-            padding: 5px;
-            font-size: 16px;
-            border-radius: 5px;
-            width: 80%;
-        }
+<button id="startButton">Start Timer</button>
+<button id="pauseButton">Pause</button>
+<button id="resetButton">Reset</button>
+<button id="toggleDisplayButton">Hide Countdown</button>
 
-        #clearURLButton {
-            background-color: #dc3545;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            margin-left: 5px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        /* Status indicator styles */
-        #statusIndicator {
-            margin-top: 10px;
-        }
-
-        /* Error message styles */
-        #errorMessage {
-            margin-top: 10px;
-        }
-
-        /* Display toggle button styles */
-        #toggleDisplayButton {
-            background-color: #28a745;
-        }
-
-        /* Hide the countdown display by default */
-        #timer {
-            display: none;
-        }
-
-        /* Card container styles */
-        .card-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
-        }
-
-        /* Card styles */
-        .card {
-            max-width: 500px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
-
-        @keyframes blink {
-            0% {opacity: 1;}
-            50% {opacity: 0;}
-            100% {opacity: 1;}
-        }
-    </style>
-</head>
-<body>
-    <!-- Card container -->
-    <div class="card-container">
-        <!-- Card -->
-        <div class="card">
-            <!-- Status indicator at the top -->
-            <div id="statusIndicator" style="font-weight: bold;"></div>
-
-            <!-- Your existing timer content goes here -->
-            <!-- Dropdown for minimum and maximum times -->
-            <label for="minTimeDropdown">Select minimum time:</label>
-            <select id="minTimeDropdown">
-                <option value="5">5 seconds</option>
-                <option value="10">10 seconds</option>
-                <option value="30">30 seconds</option>
-                <option value="60">1 minute</option>
-                <option value="300" selected>5 minutes</option>
-                <option value="600">10 minutes</option>
-                <option value="1800">30 minutes</option>
-                <option value="3600">1 hour</option>
-            </select>
-
-            <p/>
-
-            <label for="maxTimeDropdown">Select maximum time:</label>
-            <select id="maxTimeDropdown">
-                <option value="10">10 seconds</option>
-                <option value="30">30 seconds</option>
-                <option value="60">1 minute</option>
-                <option value="300">5 minutes</option>
-                <option value="600">10 minutes</option>
-                <option value="1800" selected>30 minutes</option>
-                <option value="3600">1 hour</option>
-            </select>
-
-            <p/>
-
-            <label for="urlInput">Enter custom URL:</label>
-            <input type="text" id="urlInput" value="https://www.youtube.com/watch?v=v7IIi-ETL7U">
-            <button id="clearURLButton">Clear URL</button>
-
-            <p/>
-
-            <button id="startButton">Start Timer</button>
-            <button id="pauseButton">Pause</button>
-            <button id="resetButton">Reset</button>
-            <button id="toggleDisplayButton">Hide Countdown</button>
-
-            <div id="timer"></div>
-            <div id="errorMessage" style="color: red;"></div>
-        </div>
-    </div>
-
-    <script>
+<div id="statusIndicator" style="font-weight: bold;"></div>
+<div id="timer"></div>
 <div id="errorMessage" style="color: red;"></div>
 
 <script>
@@ -294,4 +164,3 @@
 
 </body>
 </html>
-
